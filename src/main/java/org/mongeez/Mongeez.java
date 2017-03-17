@@ -12,6 +12,8 @@
 
 package org.mongeez;
 
+import com.mongodb.Mongo;
+import com.mongodb.MongoClientURI;
 import org.mongeez.commands.ChangeSet;
 import org.mongeez.commands.Script;
 import org.mongeez.reader.ChangeSetFileProvider;
@@ -19,9 +21,6 @@ import org.mongeez.reader.ChangeSetReaderFactory;
 import org.mongeez.reader.FilesetXMLChangeSetFileProvider;
 import org.mongeez.validation.ChangeSetsValidator;
 import org.mongeez.validation.DefaultChangeSetsValidator;
-
-import com.mongodb.Mongo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -39,10 +38,16 @@ public class Mongeez {
     private ChangeSetFileProvider changeSetFileProvider = null;
     private ChangeSetsValidator changeSetsValidator = new DefaultChangeSetsValidator();
     private String context = null;
+    private MongoClientURI mongoClientURI;
 
     public void process() {
         List<ChangeSet> changeSets = getChangeSets();
-        new ChangeSetExecutor(mongo, dbName, context, auth).execute(changeSets);
+        if(mongoClientURI != null) {
+            new ChangeSetExecutor(mongoClientURI, context).execute(changeSets);
+        }
+        else {
+            new ChangeSetExecutor(mongo, dbName, context, auth).execute(changeSets);
+        }
     }
 
     private List<ChangeSet> getChangeSets() {
@@ -106,4 +111,7 @@ public class Mongeez {
         this.context = context;
     }
 
+    public void setMongoClientURI(MongoClientURI mongoClientURI) {
+        this.mongoClientURI = mongoClientURI;
+    }
 }

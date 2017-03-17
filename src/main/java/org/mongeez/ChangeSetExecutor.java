@@ -12,11 +12,11 @@
 
 package org.mongeez;
 
+import com.mongodb.Mongo;
+import com.mongodb.MongoClientURI;
 import org.mongeez.commands.ChangeSet;
 import org.mongeez.commands.Script;
 import org.mongeez.dao.MongeezDao;
-
-import com.mongodb.Mongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +35,11 @@ public class ChangeSetExecutor {
 
     public ChangeSetExecutor(Mongo mongo, String dbName, String context, MongoAuth auth) {
         dao = new MongeezDao(mongo, dbName, auth);
+        this.context = context;
+    }
+
+    public ChangeSetExecutor(MongoClientURI mongoClientURI, String context) {
+        dao = new MongeezDao(mongoClientURI);
         this.context = context;
     }
 

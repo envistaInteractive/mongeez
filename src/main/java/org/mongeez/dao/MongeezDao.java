@@ -12,30 +12,27 @@
 
 package org.mongeez.dao;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.mongodb.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.mongeez.MongoAuth;
 import org.mongeez.commands.ChangeSet;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.QueryBuilder;
-import com.mongodb.WriteConcern;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MongeezDao {
     private DB db;
+    private MongoClientURI mongoClientURI;
     private List<ChangeSetAttribute> changeSetAttributes;
+    private static final String MONGO_COMMAND_PATH = "MONGO_COMMAND_PATH";
 
     public MongeezDao(Mongo mongo, String databaseName) {
-        this(mongo, databaseName, null);
+        db = mongo.getDB(databaseName);
+        configure();
     }
 
     public MongeezDao(Mongo mongo, String databaseName, MongoAuth auth) {
@@ -51,6 +48,13 @@ public class MongeezDao {
 
         final MongoClient client = new MongoClient(mongo.getServerAddressList(),  credentials);
         db = client.getDB(databaseName);
+        configure();
+    }
+
+    public MongeezDao(MongoClientURI mongoClientURI) {
+        final MongoClient mongo = new MongoClient(mongoClientURI);
+        db = mongo.getDB(mongoClientURI.getDatabase());
+        this.mongoClientURI = mongoClientURI;
         configure();
     }
 
@@ -132,7 +136,11 @@ public class MongeezDao {
     }
 
     public void runScript(String code) {
-        db.eval(code);
+        if (mongoClientURI != null) {
+            runScript(mongoClientURI, code);
+        } else {
+            db.eval(code);
+        }
     }
 
     public void logChangeSet(ChangeSet changeSet) {
@@ -144,4 +152,46 @@ public class MongeezDao {
         object.append("date", DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(System.currentTimeMillis()));
         getMongeezCollection().insert(object, WriteConcern.SAFE);
     }
+
+    protected void runScript(MongoClientURI mongoClientURI, String code) {
+
+        String[] params = new String[4];
+
+        params[0] = System.getProperty(MONGO_COMMAND_PATH, "/usr/local/bin/mongo");
+        params[1] = mongoClientURI.getURI();
+        params[2] = "--eval";
+        params[3] = code;
+
+        try {
+            final Process p = Runtime.getRuntime().exec(params);
+
+            Thread thread = new Thread() {
+                public void run() {
+                    try {
+                        String line;
+                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+                        while ((line = input.readLine()) != null) {
+                            System.out.println(line);
+                        }
+
+                        input.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            thread.start();
+            int result = p.waitFor();
+            thread.join();
+            if (result != 0) {
+                throw new MongoException("Process failed execution with result code: " + result);
+            }
+        } catch (IOException | InterruptedException e) {
+            throw MongoException.fromThrowable(e);
+        }
+
+    }
+
 }
