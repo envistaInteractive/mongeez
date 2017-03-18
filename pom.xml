@@ -2,14 +2,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <groupId>com</groupId>
+        <artifactId>eis</artifactId>
+        <version>1.5.0-SNAPSHOT</version>
     </parent>
-    
-    <groupId>org.mongeez</groupId>
+
+    <groupId>com.eis</groupId>
     <artifactId>mongeez</artifactId>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.8-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Mongeez</name>
@@ -24,27 +24,12 @@
         </license>
     </licenses>
 
-    <scm>
-        <connection>scm:git:git@github.com:secondmarket/mongeez.git</connection>
-        <developerConnection>scm:git:git@github.com:secondmarket/mongeez.git</developerConnection>
-        <url>git@github.com:secondmarket/mongeez.git</url>
-    </scm>
-
     <developers>
+
         <developer>
-            <id>epishkin</id>
-            <name>OLEKSII IEPISHKIN</name>
-            <email>epishkin@gmail.com</email>
-        </developer>
-        <developer>
-            <id>mlysaght</id>
-            <name>Michael Lysaght</name>
-            <email>mlysaght@secondmarket.com</email>
-        </developer>
-        <developer>
-            <id>davidmc24</id>
-            <name>David M. Carr</name>
-            <email>david@carrclan.us</email>
+            <id>mingardia</id>
+            <name>Michael Ingardia</name>
+            <email>mingardia@enspirecommerce.com</email>
             <timezone>-5</timezone>
         </developer>
     </developers>
