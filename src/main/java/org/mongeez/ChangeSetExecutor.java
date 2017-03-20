@@ -47,6 +47,7 @@ public class ChangeSetExecutor {
         for (ChangeSet changeSet : changeSets) {
             if (changeSet.canBeAppliedInContext(context)) {
                 if (changeSet.isRunAlways() || !dao.wasExecuted(changeSet)) {
+                    logger.info("  >> Executing change set:" + changeSet.getChangeId());
                     execute(changeSet);
                     logger.info("ChangeSet " + changeSet.getChangeId() + " has been executed");
                 } else {
