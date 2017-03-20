@@ -157,7 +157,7 @@ public class MongeezDao {
 
         String[] params = new String[4];
 
-        params[0] = System.getProperty(MONGO_COMMAND_PATH, "/usr/local/bin/mongo");
+        params[0] = System.getProperty(MONGO_COMMAND_PATH, "mongo");
         params[1] = mongoClientURI.getURI();
         params[2] = "--eval";
         params[3] = code;

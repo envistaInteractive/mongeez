@@ -25,12 +25,17 @@
     </licenses>
 
     <developers>
-
         <developer>
             <id>mingardia</id>
             <name>Michael Ingardia</name>
             <email>mingardia@enspirecommerce.com</email>
             <timezone>-5</timezone>
+        </developer>
+        <developer>
+            <id>psubba</id>
+            <name>Praveen Subba Rao</name>
+            <email>psubba@enspirecommerce.com</email>
+            <timezone>Asia/Kolkata</timezone>
         </developer>
     </developers>
 
