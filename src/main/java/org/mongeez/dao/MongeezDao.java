@@ -163,7 +163,10 @@ public class MongeezDao {
         params[3] = code;
 
         try {
-            final Process p = Runtime.getRuntime().exec(params);
+            ProcessBuilder builder = new ProcessBuilder(params);
+            builder.environment();
+
+            final Process p = builder.start();
 
             Thread thread = new Thread() {
                 public void run() {
