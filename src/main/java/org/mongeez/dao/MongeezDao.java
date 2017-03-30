@@ -16,19 +16,27 @@ import com.mongodb.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.mongeez.MongoAuth;
 import org.mongeez.commands.ChangeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class MongeezDao {
     private DB db;
     private MongoClientURI mongoClientURI;
     private List<ChangeSetAttribute> changeSetAttributes;
     private static final String MONGO_COMMAND_PATH = "MONGO_COMMAND_PATH";
+    private static final Logger LOG = LoggerFactory.getLogger(MongeezDao.class);
 
     public MongeezDao(Mongo mongo, String databaseName) {
         db = mongo.getDB(databaseName);
@@ -159,42 +167,51 @@ public class MongeezDao {
 
         params[0] = System.getProperty(MONGO_COMMAND_PATH, "mongo");
         params[1] = mongoClientURI.getURI();
-        params[2] = "--eval";
-        params[3] = code;
+        params[2] = "--quiet";
+        Path tempFilePath = null;
+        boolean error = false;
 
         try {
+
+            tempFilePath = Files.createTempFile(UUID.randomUUID().toString(), ".js");
+            Files.write(tempFilePath, code.getBytes(), StandardOpenOption.WRITE);
+
+            params[3] = tempFilePath.toAbsolutePath().toString();
+
             ProcessBuilder builder = new ProcessBuilder(params);
-            builder.environment();
+            builder.redirectErrorStream(true);
 
             final Process p = builder.start();
 
-            Thread thread = new Thread() {
-                public void run() {
-                    try {
-                        String line;
-                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-                        while ((line = input.readLine()) != null) {
-                            System.out.println(line);
-                        }
+            while (((line = input.readLine()) != null) && LOG.isInfoEnabled()) {
+                LOG.info(line);
+            }
 
-                        input.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
+            input.close();
 
-            thread.start();
             int result = p.waitFor();
-            thread.join();
             if (result != 0) {
-                throw new MongoException("Process failed execution with result code: " + result);
+                error = true;
+                throw new MongoException(MessageFormat.format("Process failed execution with result code: {0} Script " +
+                        "run parameters: {1}", result, params));
             }
         } catch (IOException | InterruptedException e) {
             throw MongoException.fromThrowable(e);
+        } finally {
+            try {
+                if (!error && tempFilePath != null) {
+                    Files.deleteIfExists(tempFilePath);
+                }
+            } catch (IOException e) {
+                if (LOG.isErrorEnabled()) {
+                    LOG.error(MessageFormat.format("Error occured while trying to delete temp file: {0}",
+                            tempFilePath), e);
+                }
+            }
         }
-
     }
 
 }
