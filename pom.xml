@@ -39,6 +39,18 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+        <repository>
+            <id>enspireCommerce</id>
+            <url>https://nexus.envistacorp.com/nexus/content/repositories/enspireCommerce</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>https://nexus.enspirecommerce.com/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <java.version>1.8</java.version>
     </properties>
