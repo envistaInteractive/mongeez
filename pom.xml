@@ -4,7 +4,7 @@
     <parent>
         <groupId>com</groupId>
         <artifactId>eis</artifactId>
-        <version>23.1.1-SNAPSHOT</version>
+        <version>22.4.3</version>
     </parent>
 
     <groupId>com.eis</groupId>
