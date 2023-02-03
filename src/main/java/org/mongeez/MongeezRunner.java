@@ -11,8 +11,8 @@
  */
 package org.mongeez;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
 import org.apache.commons.lang3.StringUtils;
 import org.mongeez.reader.ChangeSetFileProvider;
 import org.mongeez.validation.ChangeSetsValidator;
@@ -26,7 +26,7 @@ import org.springframework.core.io.Resource;
  */
 public class MongeezRunner implements InitializingBean {
     private boolean executeEnabled = false;
-    private Mongo mongo;
+    private MongoClient mongo;
     private String dbName;
     private Resource file;
 
@@ -39,7 +39,7 @@ public class MongeezRunner implements InitializingBean {
     private ChangeSetsValidator changeSetsValidator;
 
     // this is one alternative way to connect instead of directly using the java mongo client
-    private MongoClientURI mongoClientURI;
+    private ConnectionString mongoClientURI;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -83,7 +83,7 @@ public class MongeezRunner implements InitializingBean {
         this.executeEnabled = executeEnabled;
     }
 
-    public void setMongo(Mongo mongo) {
+    public void setMongo(MongoClient mongo) {
         this.mongo = mongo;
     }
 
@@ -115,11 +115,11 @@ public class MongeezRunner implements InitializingBean {
         this.authDb = authDb;
     }
 
-    public MongoClientURI getMongoClientURI() {
+    public ConnectionString getMongoClientURI() {
         return mongoClientURI;
     }
 
-    public void setMongoClientURI(MongoClientURI mongoClientURI) {
+    public void setMongoClientURI(ConnectionString mongoClientURI) {
         this.mongoClientURI = mongoClientURI;
     }
 }

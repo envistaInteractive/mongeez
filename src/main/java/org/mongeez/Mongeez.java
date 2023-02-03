@@ -12,8 +12,8 @@
 
 package org.mongeez;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
 import org.mongeez.commands.ChangeSet;
 import org.mongeez.commands.Script;
 import org.mongeez.reader.ChangeSetFileProvider;
@@ -32,13 +32,13 @@ import java.util.List;
 public class Mongeez {
     private final static Logger logger = LoggerFactory.getLogger(Mongeez.class);
 
-    private Mongo mongo = null;
+    private MongoClient mongo = null;
     private String dbName;
     private MongoAuth auth = null;
     private ChangeSetFileProvider changeSetFileProvider = null;
     private ChangeSetsValidator changeSetsValidator = new DefaultChangeSetsValidator();
     private String context = null;
-    private MongoClientURI mongoClientURI;
+    private ConnectionString mongoClientURI;
 
     public void process() {
         List<ChangeSet> changeSets = getChangeSets();
@@ -80,7 +80,7 @@ public class Mongeez {
         }
     }
 
-    public void setMongo(Mongo mongo) {
+    public void setMongo(MongoClient mongo) {
         this.mongo = mongo;
     }
 
@@ -111,7 +111,7 @@ public class Mongeez {
         this.context = context;
     }
 
-    public void setMongoClientURI(MongoClientURI mongoClientURI) {
+    public void setMongoClientURI(ConnectionString mongoClientURI) {
         this.mongoClientURI = mongoClientURI;
     }
 }
