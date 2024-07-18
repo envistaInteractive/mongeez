@@ -1,15 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com</groupId>
-        <artifactId>eis</artifactId>
-        <version>22.4.3</version>
-    </parent>
-
     <groupId>com.eis</groupId>
     <artifactId>mongeez</artifactId>
-    <version>0.9.15</version>
+    <version>0.9.16</version>
     <packaging>jar</packaging>
 
     <name>Mongeez</name>
@@ -53,19 +47,19 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.7.2</version>
+            <version>5.1.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>5.3.25</version>
+            <version>6.1.11</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
+            <version>3.14.0</version>
         </dependency>
 
         <!-- logging -->

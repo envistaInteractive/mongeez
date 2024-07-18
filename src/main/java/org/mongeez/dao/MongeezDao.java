@@ -16,6 +16,7 @@ import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -31,10 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class MongeezDao {
     private MongoDatabase db;
@@ -173,7 +171,7 @@ public class MongeezDao {
 
         String[] params = new String[4];
 
-        params[0] = System.getProperty(MONGO_COMMAND_PATH, "mongo");
+        params[0] = System.getProperty(MONGO_COMMAND_PATH, "mongosh");
         params[1] = mongoClientURI.getConnectionString();
         params[2] = "--quiet";
         Path tempFilePath = null;
@@ -202,9 +200,10 @@ public class MongeezDao {
 
             int result = p.waitFor();
             if (result != 0) {
+                String allParams = StringUtils.join(params, " ");
                 error = true;
                 throw new MongoException(MessageFormat.format("Process failed execution with result code: {0} Script " +
-                        "run parameters: {1}", result, params));
+                        "run parameters: {1}", result, allParams));
             }
         } catch (IOException | InterruptedException e) {
             throw MongoException.fromThrowable(e);
