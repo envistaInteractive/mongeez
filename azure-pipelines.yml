@@ -1,5 +1,4 @@
-trigger:
-  - none
+trigger: none
 
 pr: none
 
@@ -7,15 +6,45 @@ name: $(Build.SourceBranchName)_$(date:yyyyMMdd)$(rev:.r)
 
 pool: 'OMS-BUILD'
 
-steps:
-- task: Maven@4
-  inputs:
-    mavenPomFile: 'pom.xml'
-    goals: 'clean package'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    mavenVersionOption: 'Default'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: false
+resources:
+  repositories:
+    - repository: devops
+      name: 'OMS/devops'
+      type: git
+      ref: 'feature/offerings-jdk17'
+      endpoint: OMS-ORG-REPOS
+
+parameters:
+  - name: SkipTests
+    displayName: Skip Tests?
+    type: boolean
+    default: false
+  - name: BuildGoals
+    displayName: Build Goals
+    type: string
+    default: 'clean install'
+    values:
+      - 'clean install'
+      - 'clean deploy'
+  - name: MongoVersion
+    displayName: 'MongoDB Version'
+    type: string
+    default: '5.0'
+    values:
+      - '5.0'
+      - '6.0'
+      - '7.0'
+  - name: PublishArtifacts
+    displayName: 'Publish Artifacts (preferably dont use this)'
+    type: boolean
+    default: false
+
+jobs:
+  - template: pipelines/mongeez/pipeline.yml@devops
+    parameters:
+      JavaVersion: '17'
+      MavenVersion: '3.9.6'
+      SkipTests: ${{ parameters.SkipTests }}
+      BuildGoals: ${{ parameters.BuildGoals }}
+      MongoVersion: ${{ parameters.MongoVersion }}
+      PublishArtifacts: ${{ parameters.PublishArtifacts }}
