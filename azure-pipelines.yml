@@ -1,0 +1,9 @@
+trigger:
+  - none
+
+pr: none
+
+name: $(Build.SourceBranchName)_$(date:yyyyMMdd)$(rev:.r)
+
+pool: 'OMS-BUILD'
+
