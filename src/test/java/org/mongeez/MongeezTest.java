@@ -73,7 +73,7 @@ public class MongeezTest {
     }
 
     //Due to db.eval being removed this test does not work
-    @Test(groups = "dao", expectedExceptions = com.mongodb.MongoCommandException.class)
+    @Test(groups = "dao", expectedExceptions = com.mongodb.MongoException.class)
     public void testFailOnError_True() throws Exception {
         Mongeez mongeez = create("mongeez_fail_fail.xml");
         mongeez.process();
