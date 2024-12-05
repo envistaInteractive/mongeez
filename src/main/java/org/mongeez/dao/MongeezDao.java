@@ -15,7 +15,7 @@ package org.mongeez.dao;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.UpdateOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bson.Document;
@@ -24,6 +24,7 @@ import org.mongeez.MongoAuth;
 import org.mongeez.commands.ChangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -51,13 +52,19 @@ public class MongeezDao {
 
         if (auth != null) {
             if (auth.getAuthDb() == null || auth.getAuthDb().equals(databaseName)) {
-                credentials.add(MongoCredential.createCredential(auth.getUsername(), databaseName, auth.getPassword().toCharArray()));
+                credentials.add(MongoCredential.createCredential(auth.getUsername(),
+                        databaseName, auth.getPassword().toCharArray()));
             } else {
-                credentials.add(MongoCredential.createCredential(auth.getUsername(), auth.getAuthDb(), auth.getPassword().toCharArray()));
+                credentials.add(MongoCredential.createCredential(auth.getUsername(),
+                        auth.getAuthDb(), auth.getPassword().toCharArray()));
             }
         }
-
-        final MongoClient client = MongoClients.create();
+        MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder();
+        if(!CollectionUtils.isEmpty(credentials)){
+            settingsBuilder.credential(credentials.get(0));
+        }
+        MongoClientSettings settings = settingsBuilder.build();
+        final MongoClient client = MongoClients.create(settings);
         db = client.getDatabase(databaseName);
         configure();
     }
@@ -77,15 +84,21 @@ public class MongeezDao {
     }
 
     private void addTypeToUntypedRecords() {
-        Bson q = Filters.exists("type", false);
-        Bson o = Updates.combine(
-                Updates.set("type", RecordType.changeSetExecution.name()));
+
+//        DBObject q = new QueryBuilder().put("type").exists(false).get();
+        Bson q = Filters.exists("type",false);
+        Document o = new Document("$set", new Document("type", RecordType.changeSetExecution.name()));
+//        getMongeezCollection().update(q, o, false, true, WriteConcern.SAFE);
+        UpdateOptions options = new UpdateOptions();
+        options.upsert(false);
         getMongeezCollection().updateMany(q, o);
     }
 
     private void loadConfigurationRecord() {
+
+//        DBObject q = new QueryBuilder().put("type").is(RecordType.configuration.name()).get();
         Bson q = Filters.eq("type",RecordType.configuration.name());
-        Document configRecord = (Document) getMongeezCollection().find(q).first();
+        Document configRecord = getMongeezCollection().find(q).first();
         if (configRecord == null) {
             if (getMongeezCollection().countDocuments() > 0L) {
                 // We have pre-existing records, so don't assume that they support the latest features
@@ -99,6 +112,7 @@ public class MongeezDao {
                                 .append("type", RecordType.configuration.name())
                                 .append("supportResourcePath", true);
             }
+//            getMongeezCollection().insert(configRecord, WriteConcern.SAFE);
             getMongeezCollection().insertOne(configRecord);
         }
         Object supportResourcePath = configRecord.get("supportResourcePath");
@@ -144,7 +158,7 @@ public class MongeezDao {
         return getMongeezCollection().countDocuments(query) > 0;
     }
 
-    private MongoCollection getMongeezCollection() {
+    private MongoCollection<Document> getMongeezCollection() {
         return db.getCollection("mongeez");
     }
 
@@ -154,6 +168,11 @@ public class MongeezDao {
         } else {
             //Has been deprecated and alternatives are in the DB shell via $where
             //db.eval(code);
+           ConnectionString connectionString =
+                   new ConnectionString("mongodb://localhost/"+db.getName());
+
+           mongoClientURI = connectionString;
+           runScript(mongoClientURI, code);
         }
     }
 

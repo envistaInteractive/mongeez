@@ -48,7 +48,6 @@ public class MongeezTest {
     @Test(groups = "dao")
     public void testMongeez() throws Exception {
         Mongeez mongeez = create("mongeez.xml");
-
         mongeez.process();
 
         assertEquals(db.getCollection("mongeez").countDocuments(), 5);
