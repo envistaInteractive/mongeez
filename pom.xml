@@ -4,7 +4,7 @@
 
     <groupId>com.eis</groupId>
     <artifactId>mongeez</artifactId>
-    <version>0.9.16-SNAPSHOT</version>
+    <version>0.9.16</version>
     <packaging>jar</packaging>
 
     <name>Mongeez</name>
@@ -79,8 +79,8 @@
 
     <distributionManagement>
         <repository>
-            <id>releases</id>
-            <url>https://highjumpvso.pkgs.visualstudio.com/OMS/_packaging/releases/maven/v1</url>
+            <id>thirdparty</id>
+            <url>https://highjumpvso.pkgs.visualstudio.com/OMS/_packaging/thirdparty/maven/v1</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
