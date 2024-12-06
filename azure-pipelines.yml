@@ -11,7 +11,7 @@ resources:
     - repository: devops
       name: 'OMS/devops'
       type: git
-      ref: 'feature/offerings-jdk17'
+      ref: 'master'
       endpoint: OMS-ORG-REPOS
 
 parameters:
