@@ -14,7 +14,7 @@ resources:
     - repository: devops
       name: 'OMS/devops'
       type: git
-      ref: 'master'
+      ref: 'feature/test-workernode-1'
       endpoint: OMS-ORG-REPOS
 
 parameters:
