@@ -4,10 +4,8 @@ pr: none
 
 name: $(Build.SourceBranchName)_$(date:yyyyMMdd)$(rev:.r)
 
-pool:
-  name: OMS-BUILD 
-  demands:
-    - Agent.Name -equals workernodes-AWS-1  # the exact name of your target agent
+pool: 
+  name: OMS-AWS-SCALESET-POOL
 
 resources:
   repositories:
